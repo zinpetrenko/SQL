@@ -410,7 +410,7 @@ order by 1*/
 --and num_sdp in (select PREFIX from rd_sms_content)
      
 --select rowid,l.* from monitoring_tbl l 
---grant select on loshara to stat_msk;
+--grant select on monitoring_tbl to stat_msk;
 --drop table rpu;
 --create table rpu (num varchar2 (20) not null, cat varchar2 (125) not null, price varchar2 (20) not null, direct varchar2 (200) not null);
 
