@@ -1,5 +1,5 @@
 spool D:\Zinoviy\start\bad.txt
---Префиксы, заведённые в Форис
+--РџСЂРµС„РёРєСЃС‹, Р·Р°РІРµРґС‘РЅРЅС‹Рµ РІ Р¤РѕСЂРёСЃ
 drop table rd_content;
 create table rd_content as
 select --+ ordered
@@ -16,7 +16,7 @@ from
 , rd.prefix_group_member pgm
 , (
  select * from rd.prefix_group
- where (PREFIX_GROUP_NAME like '%атегория%' or PREFIX_GROUP_NAME='SMS')
+ where (PREFIX_GROUP_NAME like '%Р°С‚РµРіРѕСЂРёСЏ%' or PREFIX_GROUP_NAME='SMS')
  and PREFIX_GROUP_NAME not like '%GOOD%OK%'
  and PREFIX_GROUP_NAME not like '%URL_%'
  and PREFIX_GROUP_NAME not like '%LBS%'
@@ -57,69 +57,69 @@ alter table rd_content add direction varchar2(10);
 --select * from rd_sms_content_price order by 1
 
 
---Приведём данные с SDP в удобоваримую форму
+--РџСЂРёРІРµРґС‘Рј РґР°РЅРЅС‹Рµ СЃ SDP РІ СѓРґРѕР±РѕРІР°СЂРёРјСѓСЋ С„РѕСЂРјСѓ
 
---delete sdp_sms_content where num_sdp not in (select short_num from katya.hp_ium@y.world h); -- Удаление номеров др. МР
+--delete sdp_sms_content where num_sdp not in (select short_num from katya.hp_ium@y.world h); -- РЈРґР°Р»РµРЅРёРµ РЅРѕРјРµСЂРѕРІ РґСЂ. РњР 
 
-update sdp_sms_content set direction = 'Исходящее'
+update sdp_sms_content set direction = 'РСЃС…РѕРґСЏС‰РµРµ'
 where SDP_TARIFF_RULE in ('C0','C1','C4');
 commit;
 
-update sdp_sms_content set direction = 'Входящее'
+update sdp_sms_content set direction = 'Р’С…РѕРґСЏС‰РµРµ'
 where SDP_TARIFF_RULE in ('C2','C3','C5');
 --and PRICE_SDP <> '0';
 commit;
 
-update rd_content set direction = 'Исходящее';
+update rd_content set direction = 'РСЃС…РѕРґСЏС‰РµРµ';
 commit;
 
-update rd_content set direction = 'Входящее'
+update rd_content set direction = 'Р’С…РѕРґСЏС‰РµРµ'
 where PREFIX_GROUP_NAME like '% - 0';
 commit;
 
---Цены в Форис (ТП Базовый)
-  --SMS Исходящее
+--Р¦РµРЅС‹ РІ Р¤РѕСЂРёСЃ (РўРџ Р‘Р°Р·РѕРІС‹Р№)
+  --SMS РСЃС…РѕРґСЏС‰РµРµ
 drop table rd_sms_content_price;  
 create table rd_sms_content_price as
 select 
-ltrim (tz.TARIFF_ZONE_NAME, 'МТС Москва --> ') as cat, 
-rtrim(ltrim (p.PRICE_DESCRIPTION, 'Цена: '),'Цены для услуги:') as price,
+ltrim (tz.TARIFF_ZONE_NAME, 'РњРўРЎ РњРѕСЃРєРІР° --> ') as cat, 
+rtrim(ltrim (p.PRICE_DESCRIPTION, 'Р¦РµРЅР°: '),'Р¦РµРЅС‹ РґР»СЏ СѓСЃР»СѓРіРё:') as price,
 p.time_schema_start
 from 
 rd.price        p, 
 rd.TARIFF_ZONE tz 
 where p.tariff_plan_id = 7000
 and tz.TARIFF_ZONE_ID = p.TARIFF_ZONE_id 
-and tz.TARIFF_ZONE_NAME like '%SMS%' ||'Категория%'
-and p.NETWORK_SERVICE_ID in (3) --2 - Входящая SMS, 3 - Исходящая SMS
-and TARIFF_ZONE_NAME like '%МТС Москва%' 
+and tz.TARIFF_ZONE_NAME like '%SMS%' ||'РљР°С‚РµРіРѕСЂРёСЏ%'
+and p.NETWORK_SERVICE_ID in (3) --2 - Р’С…РѕРґСЏС‰Р°СЏ SMS, 3 - РСЃС…РѕРґСЏС‰Р°СЏ SMS
+and TARIFF_ZONE_NAME like '%РњРўРЎ РњРѕСЃРєРІР°%' 
 order by 1;
 
 commit;
 
-  --SMS Входящее
+  --SMS Р’С…РѕРґСЏС‰РµРµ
 insert into rd_sms_content_price
 select 
-ltrim (tz.TARIFF_ZONE_NAME, 'МТС Москва <-- '), 
-replace(rtrim(ltrim (p.PRICE_DESCRIPTION, 'Цена: '),'Цены для услуги:'),',','.'),
+ltrim (tz.TARIFF_ZONE_NAME, 'РњРўРЎ РњРѕСЃРєРІР° <-- '), 
+replace(rtrim(ltrim (p.PRICE_DESCRIPTION, 'Р¦РµРЅР°: '),'Р¦РµРЅС‹ РґР»СЏ СѓСЃР»СѓРіРё:'),',','.'),
 p.time_schema_start
 from 
 rd.price p,
 rd.TARIFF_ZONE tz 
 where p.tariff_plan_id = 7000
 and tz.TARIFF_ZONE_ID = p.TARIFF_ZONE_id 
-and tz.TARIFF_ZONE_NAME like '%SMS%' ||'категория%'
-and p.NETWORK_SERVICE_ID in (2) --2 - Входящая SMS, 3 - Исходящая SMS
-and TARIFF_ZONE_NAME like '%МТС Москва%'
+and tz.TARIFF_ZONE_NAME like '%SMS%' ||'РєР°С‚РµРіРѕСЂРёСЏ%'
+and p.NETWORK_SERVICE_ID in (2) --2 - Р’С…РѕРґСЏС‰Р°СЏ SMS, 3 - РСЃС…РѕРґСЏС‰Р°СЏ SMS
+and TARIFF_ZONE_NAME like '%РњРўРЎ РњРѕСЃРєРІР°%'
 order by 1;
 
 commit;
 
-  --MMS Исходящее
+  --MMS РСЃС…РѕРґСЏС‰РµРµ
 insert into rd_sms_content_price  
 select 
-ltrim (tz.TARIFF_ZONE_NAME, 'МТС Москва --> '), 
-replace(ltrim (p.PRICE_DESCRIPTION, 'Цена: '),',','.'),
+ltrim (tz.TARIFF_ZONE_NAME, 'РњРўРЎ РњРѕСЃРєРІР° --> '), 
+replace(ltrim (p.PRICE_DESCRIPTION, 'Р¦РµРЅР°: '),',','.'),
 p.time_schema_start
 from 
 rd.price p
@@ -127,32 +127,32 @@ rd.price p
 where p.tariff_plan_id =7000 --in (385,6507,7000,7010,7930,7931,8121,8123)
 and 
 tz.TARIFF_ZONE_ID = p.TARIFF_ZONE_id 
-and tz.TARIFF_ZONE_NAME like '%MMS%' ||'%атегория%'
-and p.NETWORK_SERVICE_ID in (5) --2 - Входящая SMS, 3 - Исходящая SMS
-and TARIFF_ZONE_NAME like '%МТС Москва%'
+and tz.TARIFF_ZONE_NAME like '%MMS%' ||'%Р°С‚РµРіРѕСЂРёСЏ%'
+and p.NETWORK_SERVICE_ID in (5) --2 - Р’С…РѕРґСЏС‰Р°СЏ SMS, 3 - РСЃС…РѕРґСЏС‰Р°СЏ SMS
+and TARIFF_ZONE_NAME like '%РњРўРЎ РњРѕСЃРєРІР°%'
 order by 1;
 
 commit;
 
 insert into rd_sms_content_price 
-values ('SMS', 'по ТП', to_date('07.01.2007','dd.mm.yyyy') );
+values ('SMS', 'РїРѕ РўРџ', to_date('07.01.2007','dd.mm.yyyy') );
 commit;
 --select * from rd_sms_content_price
 
- --MMS Входящее
+ --MMS Р’С…РѕРґСЏС‰РµРµ
 /*insert into rd_sms_content_price  
 select 
-ltrim (tz.TARIFF_ZONE_NAME, 'МТС Москва <-- '), 
-ltrim (p.PRICE_DESCRIPTION, 'Цена: '),
+ltrim (tz.TARIFF_ZONE_NAME, 'РњРўРЎ РњРѕСЃРєРІР° <-- '), 
+ltrim (p.PRICE_DESCRIPTION, 'Р¦РµРЅР°: '),
 p.time_schema_start
 from 
 rd.price p
 , rd.TARIFF_ZONE tz 
 where p.tariff_plan_id = 7000
 and tz.TARIFF_ZONE_ID = p.TARIFF_ZONE_id 
-and tz.TARIFF_ZONE_NAME like '%MMS%' ||'%атегория%'
-and p.NETWORK_SERVICE_ID in (4) --2 - Входящая SMS, 3 - Исходящая SMS
-and TARIFF_ZONE_NAME like '%МТС Москва%'
+and tz.TARIFF_ZONE_NAME like '%MMS%' ||'%Р°С‚РµРіРѕСЂРёСЏ%'
+and p.NETWORK_SERVICE_ID in (4) --2 - Р’С…РѕРґСЏС‰Р°СЏ SMS, 3 - РСЃС…РѕРґСЏС‰Р°СЏ SMS
+and TARIFF_ZONE_NAME like '%РњРўРЎ РњРѕСЃРєРІР°%'
 order by 1;
 
 commit;*/
@@ -193,7 +193,7 @@ and p.cat = b.PREFIX_GROUP_NAME;
 commit;
 SPOOL OFF
 
---Подведём итоги
+--РџРѕРґРІРµРґС‘Рј РёС‚РѕРіРё
 set echo off 
 SET newpage 0 
 SET space 0 
@@ -205,22 +205,22 @@ SET TERMOUT OFF
 SET trimout ON 
 SET linesize 4000
 
-      --То, чего нет в Форис, но есть на SDP 
+      --РўРѕ, С‡РµРіРѕ РЅРµС‚ РІ Р¤РѕСЂРёСЃ, РЅРѕ РµСЃС‚СЊ РЅР° SDP 
 --truncate table net_v_foris;
 --insert into net_v_foris
 --select * from net_v_foris
 drop table net_v_foris;
 create table net_v_foris as
 select 
-s.NUM_SDP "Короткий номер"
-,s.CAT_SDP "Тарифная категория"
-,s.PRICE_SDP "Стоимость"
-,s.direction "Направление тарификации"
-,r.cat "Тарифная категория (РПУ)"
-,r.price "Стоимость (РПУ)"
-,r.direct "Направление тарификации (РПУ)"
+s.NUM_SDP "РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ"
+,s.CAT_SDP "РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ"
+,s.PRICE_SDP "РЎС‚РѕРёРјРѕСЃС‚СЊ"
+,s.direction "РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё"
+,r.cat "РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ (Р РџРЈ)"
+,r.price "РЎС‚РѕРёРјРѕСЃС‚СЊ (Р РџРЈ)"
+,r.direct "РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё (Р РџРЈ)"
 ,r.traffic "MAR/SDP"
-,r.document "Документ"
+,r.document "Р”РѕРєСѓРјРµРЅС‚"
 from sdp_sms_content s, rpu r 
 where NUM_SDP not in (select prefix from rd_content)
 and r.num(+)=s.num_sdp
@@ -233,37 +233,37 @@ grant select on net_v_foris to stat_msk;
 SPOOL D:\Zinoviy\net_v_foris.xls
 
 select 
-'АСР'||chr(9)||
-'Короткий номер'||chr(9)||
-'Тарифная категория'||chr(9)||
-'Валюта'||chr(9)||
-'Стоимость'||chr(9)||
-'Направление тарификации'||chr(9)||
-'Тарифная категория (РПУ)'||chr(9)||
-'Стоимость (РПУ)'||chr(9)||
-'Направление тарификации (РПУ)'||chr(9)||
+'РђРЎР '||chr(9)||
+'РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ'||chr(9)||
+'РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ'||chr(9)||
+'Р’Р°Р»СЋС‚Р°'||chr(9)||
+'РЎС‚РѕРёРјРѕСЃС‚СЊ'||chr(9)||
+'РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё'||chr(9)||
+'РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ (Р РџРЈ)'||chr(9)||
+'РЎС‚РѕРёРјРѕСЃС‚СЊ (Р РџРЈ)'||chr(9)||
+'РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё (Р РџРЈ)'||chr(9)||
 'MAR/SDP'||chr(9)||
-'Документ'||chr(9)
+'Р”РѕРєСѓРјРµРЅС‚'||chr(9)
 from dual;
 
 select
 'SDP'||chr(9)||
-''''||"Короткий номер"||chr(9)||
-"Тарифная категория"||chr(9)||
-'Рубли'||chr(9)||
-''''||"Стоимость"||chr(9)
-||"Направление тарификации"||chr(9)
-||"Тарифная категория (РПУ)"||chr(9)
-||"Стоимость (РПУ)"||chr(9)
-||"Направление тарификации (РПУ)"||chr(9)
+''''||"РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ"||chr(9)||
+"РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ"||chr(9)||
+'Р СѓР±Р»Рё'||chr(9)||
+''''||"РЎС‚РѕРёРјРѕСЃС‚СЊ"||chr(9)
+||"РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё"||chr(9)
+||"РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ (Р РџРЈ)"||chr(9)
+||"РЎС‚РѕРёРјРѕСЃС‚СЊ (Р РџРЈ)"||chr(9)
+||"РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё (Р РџРЈ)"||chr(9)
 ||"MAR/SDP"||chr(9)
-||"Документ"
+||"Р”РѕРєСѓРјРµРЅС‚"
 from net_v_foris
-order by "Короткий номер";
+order by "РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ";
 
 SPOOL OFF
       
---То, что есть в Форис, но нет на SDP 
+--РўРѕ, С‡С‚Рѕ РµСЃС‚СЊ РІ Р¤РѕСЂРёСЃ, РЅРѕ РЅРµС‚ РЅР° SDP 
 
 --select * from net_na_sdp
 --truncate table net_na_sdp;
@@ -271,18 +271,18 @@ SPOOL OFF
 drop table net_na_sdp;
 create table net_na_sdp as
 select 
-rsc.PREFIX --"Короткий номер"
-, replace (rsc.phone_prefix_name,'"') as phone_prefix_name --"Название префикса"
-, rsc.PREFIX_GROUP_NAME               as PREFIX_GROUP_NAME --"Тарифная категория"
-, rsc.PRICE                           as price             --"Стоимость"
-, rsc.DIRECTION                       as DIRECTION         --"Направление тарификации"
-, rsc.MEMBERSHIP_START                as MEMBERSHIP_START  --"Начало действия префикса"
-, rsc.MEMBERSHIP_END                  as MEMBERSHIP_END    --"Завершение действия префикса"
-, r.cat                               as cat               --"Тарифная категория (РПУ)"
-,r.price                              as price_rpu         --"Стоимость (РПУ)"  
-,r.direct                             as direct            --"Направление тарификации (РПУ)"
+rsc.PREFIX --"РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ"
+, replace (rsc.phone_prefix_name,'"') as phone_prefix_name --"РќР°Р·РІР°РЅРёРµ РїСЂРµС„РёРєСЃР°"
+, rsc.PREFIX_GROUP_NAME               as PREFIX_GROUP_NAME --"РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ"
+, rsc.PRICE                           as price             --"РЎС‚РѕРёРјРѕСЃС‚СЊ"
+, rsc.DIRECTION                       as DIRECTION         --"РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё"
+, rsc.MEMBERSHIP_START                as MEMBERSHIP_START  --"РќР°С‡Р°Р»Рѕ РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР°"
+, rsc.MEMBERSHIP_END                  as MEMBERSHIP_END    --"Р—Р°РІРµСЂС€РµРЅРёРµ РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР°"
+, r.cat                               as cat               --"РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ (Р РџРЈ)"
+,r.price                              as price_rpu         --"РЎС‚РѕРёРјРѕСЃС‚СЊ (Р РџРЈ)"  
+,r.direct                             as direct            --"РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё (Р РџРЈ)"
 ,r.traffic                                                 --"MAR/SDP"
-,r.document                                                --"Документ"
+,r.document                                                --"Р”РѕРєСѓРјРµРЅС‚"
 from rd_sms_content rsc, rpu r  
 where rsc.prefix not in (select NUM_SDP from sdp_sms_content) 
 and sysdate between rsc.MEMBERSHIP_START and nvl (rsc.MEMBERSHIP_END, to_date('01-01-2018 00:00:00', 'dd-mm-yyyy hh24:mi:ss' ))
@@ -295,20 +295,20 @@ grant select on net_na_sdp to stat_msk;
 SPOOL D:\Zinoviy\net_na_sdp.xls
 
 select 
-'АСР'||chr(9)
-||'Короткий номер'||chr(9)
-||'Название префикса'||chr(9)
-||'Тарифная категория'||chr(9)
-||'Валюта'||chr(9)
-||'Стоимость'||chr(9)
-||'Направление тарификации'||chr(9)  
-||'Дата начала действия префикса'||chr(9)
-||'Дата завершения действия префикса'||chr(9)||
-'Тарифная категория (РПУ)'||chr(9)||
-'Стоимость (РПУ)'||chr(9)||
-'Направление тарификации (РПУ)'||chr(9)||
+'РђРЎР '||chr(9)
+||'РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ'||chr(9)
+||'РќР°Р·РІР°РЅРёРµ РїСЂРµС„РёРєСЃР°'||chr(9)
+||'РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ'||chr(9)
+||'Р’Р°Р»СЋС‚Р°'||chr(9)
+||'РЎС‚РѕРёРјРѕСЃС‚СЊ'||chr(9)
+||'РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё'||chr(9)  
+||'Р”Р°С‚Р° РЅР°С‡Р°Р»Р° РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР°'||chr(9)
+||'Р”Р°С‚Р° Р·Р°РІРµСЂС€РµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР°'||chr(9)||
+'РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ (Р РџРЈ)'||chr(9)||
+'РЎС‚РѕРёРјРѕСЃС‚СЊ (Р РџРЈ)'||chr(9)||
+'РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё (Р РџРЈ)'||chr(9)||
 'MAR/SDP'||chr(9)||
-'Документ'||chr(9)
+'Р”РѕРєСѓРјРµРЅС‚'||chr(9)
 from dual;
 
 select 
@@ -316,7 +316,7 @@ select
 ||''''||PREFIX||chr(9)
 ||PHONE_PREFIX_NAME||chr(9)
 ||PREFIX_GROUP_NAME||chr(9)
-||'Рубли'||chr(9)
+||'Р СѓР±Р»Рё'||chr(9)
 ||''''||PRICE||chr(9)
 ||DIRECTION||chr(9)
 ||to_char(MEMBERSHIP_START, 'dd-mm-yyyy hh24:mi:ss' )||chr(9)
@@ -330,7 +330,7 @@ from net_na_sdp;
 
 SPOOL OFF
 
-      --Несоответствие цены
+      --РќРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ С†РµРЅС‹
 
 drop table price_issues;
 create table price_issues as
@@ -352,37 +352,37 @@ rd_sms_content r
 , sdp_sms_content s
 where 1=1
 and r.prefix = s.num_sdp
-and decode (Price,'по ТП','0.00')<> s.PRICE_SDP
+and decode (Price,'РїРѕ РўРџ','0.00')<> s.PRICE_SDP
 --and r.prefix not in ()
 ;
 
 SPOOL D:\Zinoviy\price_issues.xls
 
 select 
-'Префикс (Форис)'||chr(9)||
-'Префикс (SDP)'||chr(9)||
-'Название префикса (Форис)'||chr(9)||
-'Категория (SDP)'||chr(9)||
-'Название группы префиксов (Форис)'||chr(9)||
-'Стоимость (Форис)'||chr(9)||
-'Стоимость (SDP)'||chr(9)||
-'Тип тарификации (SDP)'||chr(9)||
-'Дата начала действия префикса (Форис)'||chr(9)||
-'Дата завершения действия префикса (Форис)'||chr(9)||
-'Минимальная длина префикса (Форис)'||chr(9)||
-'Максимальная длина префикса (Форис)' from dual;
+'РџСЂРµС„РёРєСЃ (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РџСЂРµС„РёРєСЃ (SDP)'||chr(9)||
+'РќР°Р·РІР°РЅРёРµ РїСЂРµС„РёРєСЃР° (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РљР°С‚РµРіРѕСЂРёСЏ (SDP)'||chr(9)||
+'РќР°Р·РІР°РЅРёРµ РіСЂСѓРїРїС‹ РїСЂРµС„РёРєСЃРѕРІ (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РЎС‚РѕРёРјРѕСЃС‚СЊ (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РЎС‚РѕРёРјРѕСЃС‚СЊ (SDP)'||chr(9)||
+'РўРёРї С‚Р°СЂРёС„РёРєР°С†РёРё (SDP)'||chr(9)||
+'Р”Р°С‚Р° РЅР°С‡Р°Р»Р° РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР° (Р¤РѕСЂРёСЃ)'||chr(9)||
+'Р”Р°С‚Р° Р·Р°РІРµСЂС€РµРЅРёСЏ РґРµР№СЃС‚РІРёСЏ РїСЂРµС„РёРєСЃР° (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РњРёРЅРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° РїСЂРµС„РёРєСЃР° (Р¤РѕСЂРёСЃ)'||chr(9)||
+'РњР°РєСЃРёРјР°Р»СЊРЅР°СЏ РґР»РёРЅР° РїСЂРµС„РёРєСЃР° (Р¤РѕСЂРёСЃ)' from dual;
 
 select distinct * from price_issues;
 
 SPOOL OFF
 
-insert into loshara --Технологическая таблица для вывода на сайт мониторинга
+insert into loshara --РўРµС…РЅРѕР»РѕРіРёС‡РµСЃРєР°СЏ С‚Р°Р±Р»РёС†Р° РґР»СЏ РІС‹РІРѕРґР° РЅР° СЃР°Р№С‚ РјРѕРЅРёС‚РѕСЂРёРЅРіР°
 --create table loshara as
 select 
-sysdate "Дата",
-(select count (*) from net_v_foris) "Нет в Форис",
-(select count (*) from net_na_sdp) "Нет на SDP",
-(select count (*) from price_issues) "Несоответствие в ценах",
+sysdate "Р”Р°С‚Р°",
+(select count (*) from net_v_foris) "РќРµС‚ РІ Р¤РѕСЂРёСЃ",
+(select count (*) from net_na_sdp) "РќРµС‚ РЅР° SDP",
+(select count (*) from price_issues) "РќРµСЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ РІ С†РµРЅР°С…",
 (select count (*) from rd_sms_content r, sdp_sms_content s where r.prefix not in (select num from rpu) and r.prefix = s.num_sdp)
 from  dual; 
 
@@ -449,11 +449,11 @@ order by 1*/
 
 --
 /*select 
-r.PREFIX "Короткий номер"
-, r.phone_prefix_name "Название префикса"
-, r.PREFIX_GROUP_NAME "Тарифная категория"
-, r.PRICE "Стоимость"
-, r.DIRECTION "Направление тарификации"
+r.PREFIX "РљРѕСЂРѕС‚РєРёР№ РЅРѕРјРµСЂ"
+, r.phone_prefix_name "РќР°Р·РІР°РЅРёРµ РїСЂРµС„РёРєСЃР°"
+, r.PREFIX_GROUP_NAME "РўР°СЂРёС„РЅР°СЏ РєР°С‚РµРіРѕСЂРёСЏ"
+, r.PRICE "РЎС‚РѕРёРјРѕСЃС‚СЊ"
+, r.DIRECTION "РќР°РїСЂР°РІР»РµРЅРёРµ С‚Р°СЂРёС„РёРєР°С†РёРё"
  from rd_sms_content r, sdp_sms_content s where r.prefix not in (select num from rpu) and r.prefix = s.num_sdp
  
 
