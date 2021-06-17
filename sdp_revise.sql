@@ -376,8 +376,8 @@ select distinct * from price_issues;
 
 SPOOL OFF
 
-insert into loshara --Технологическая таблица для вывода на сайт мониторинга
---create table loshara as
+insert into monitoring_tbl --Технологическая таблица для вывода на сайт мониторинга
+--create table monitoring_tbl as
 select 
 sysdate "Дата",
 (select count (*) from net_v_foris) "Нет в Форис",
@@ -409,20 +409,20 @@ order by 1*/
 
 --and num_sdp in (select PREFIX from rd_sms_content)
      
---select rowid,l.* from loshara l 
+--select rowid,l.* from monitoring_tbl l 
 --grant select on loshara to stat_msk;
 --drop table rpu;
 --create table rpu (num varchar2 (20) not null, cat varchar2 (125) not null, price varchar2 (20) not null, direct varchar2 (200) not null);
 
 --select * from rpu order by 1
 
---delete loshara where DT = to_date('01.10.2007 11:36:28','dd-mm-yyyy hh24:mi:ss' )
+--delete monitoring_tbl where DT = to_date('01.10.2007 11:36:28','dd-mm-yyyy hh24:mi:ss' )
 
 --select * from rd.price
 
 --drop database link y.world;
 --create database link y.world
---connect to shchekutev identified by pokes254 using 'y'
+--connect to s_v identified by password using 'y'
 
 --select * from katya.hp_ium@y.world  where SHORT_NUM in (3707,22288,0917) order by 1
 
